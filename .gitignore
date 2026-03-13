@@ -1,0 +1,17 @@
+# Secrets
+agent/auth.json
+
+# Sessions (local to machine)
+agent/sessions/
+
+# Git package clones (auto-installed from settings.json)
+agent/git/
+
+# Logs
+logs/
+
+# Plugin state (session-local)
+.pi/
+
+# OS
+.DS_Store

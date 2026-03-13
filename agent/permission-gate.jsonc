@@ -1,0 +1,97 @@
+// =============================================================================
+// Permission Gate - configuration
+// =============================================================================
+//
+// Permission states:
+//   "allow"  - permit silently
+//   "ask"    - prompt (Yes / Yes for session / No)
+//   "deny"   - block without asking
+//   "cwd"    - allow only inside working directory, otherwise "ask"
+//             (only for tools with paths: read, write, edit, grep, find, ls)
+//
+// Destructive bash commands (rm, delete, uninstall, sudo, etc.)
+// automatically get at least "ask", even if "allow" is specified here.
+//
+// Bash patterns: * = any substring. More specific pattern wins.
+// On equal specificity, the last one in the list wins.
+// =============================================================================
+{
+  // Tool permissions
+  "tools": {
+    "read": "cwd",      // file reading - free inside project
+    "grep": "cwd",      // content search - free inside project
+    "find": "cwd",      // file search - free inside project
+    "ls": "cwd",        // directory listing - free inside project
+    "write": "ask",     // file writing - always ask
+    "edit": "ask",      // file editing - always ask
+    "bash": "ask",      // bash default (overridden by patterns below)
+    "mcp": "ask"        // MCP calls - always ask
+  },
+
+  // Bash patterns (order matters for equal specificity!)
+  "bash": {
+    // --- Safe read-only commands ---
+    "git status": "allow",
+    "git diff *": "allow",
+    "git log *": "allow",
+    "git branch": "allow",
+    "git branch --list *": "allow",
+    "git remote -v": "allow",
+    "ls *": "allow",
+    "cat *": "allow",
+    "echo *": "allow",
+    "pwd": "allow",
+    "which *": "allow",
+    "find *": "allow",
+    "grep *": "allow",
+    "head *": "allow",
+    "tail *": "allow",
+    "wc *": "allow",
+    "sort *": "allow",
+    "date": "allow",
+    "date *": "allow",
+    "whoami": "allow",
+    "uname *": "allow",
+    "env": "allow",
+    "printenv *": "allow",
+    "type *": "allow",
+    "file *": "allow",
+    "stat *": "allow",
+    "du *": "allow",
+    "df *": "allow",
+    "test *": "allow",
+    "[ *": "allow",
+    "basename *": "allow",
+    "dirname *": "allow",
+    "realpath *": "allow",
+    "readlink *": "allow",
+
+    // --- Commands that require confirmation ---
+    "git *": "ask",
+    "npm *": "ask",
+    "npx *": "ask",
+    "node *": "ask",
+    "pnpm *": "ask",
+    "yarn *": "ask",
+    "bun *": "ask",
+    "deno *": "ask",
+    "pip *": "ask",
+    "pip3 *": "ask",
+    "python *": "ask",
+    "python3 *": "ask",
+    "cargo *": "ask",
+    "go *": "ask",
+    "make *": "ask",
+    "cmake *": "ask",
+    "docker *": "ask",
+    "kubectl *": "ask",
+    "brew *": "ask",
+    "apt *": "ask",
+    "apt-get *": "ask",
+    "curl *": "ask",
+    "wget *": "ask",
+
+    // --- Blocked commands ---
+    "sudo *": "deny"
+  }
+}

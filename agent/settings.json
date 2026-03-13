@@ -1,0 +1,14 @@
+{
+  "lastChangelogVersion": "0.57.1",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-4-6",
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "git:github.com/badlogic/pi-skills",
+    "npm:pi-mcp-adapter",
+    "npm:@aliou/pi-guardrails",
+    "npm:pi-superpowers-plus",
+    "npm:@juanibiapina/pi-extension-settings",
+    "npm:@plannotator/pi-extension"
+  ]
+}
