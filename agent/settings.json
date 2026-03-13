@@ -7,8 +7,9 @@
     "git:github.com/badlogic/pi-skills",
     "npm:pi-mcp-adapter",
     "npm:@aliou/pi-guardrails",
-    "npm:pi-superpowers-plus",
+    "npm:pi-subagents",
     "npm:@juanibiapina/pi-extension-settings",
-    "npm:@plannotator/pi-extension"
+    "npm:@plannotator/pi-extension",
+    "npm:pi-teams"
   ]
 }
