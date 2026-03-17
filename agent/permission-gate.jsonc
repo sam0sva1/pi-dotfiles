@@ -2,96 +2,73 @@
 // Permission Gate - configuration
 // =============================================================================
 //
-// Permission states:
-//   "allow"  - permit silently
-//   "ask"    - prompt (Yes / Yes for session / No)
-//   "deny"   - block without asking
-//   "cwd"    - allow only inside working directory, otherwise "ask"
-//             (only for tools with paths: read, write, edit, grep, find, ls)
+// Model summary:
+// - trustedRoots are resolved relative to the current session cwd
+// - workspace-derived policy snapshots are recomputed when cwd changes
+// - read/ls/find/grep inside trusted roots are allowed silently
+// - access outside trusted roots is asked per target
+// - browse grants are subtree-scoped to a canonical directory root
+// - edit/write are asked per file; session grants are file-scoped
+// - sensitive paths always ask once and are never cached
+// - meta-tools in alwaysAskTools always ask once and are never cached
+// - bash uses a small allowlist; risky commands ask once only
 //
-// Destructive bash commands (rm, delete, uninstall, sudo, etc.)
-// automatically get at least "ask", even if "allow" is specified here.
-//
-// Bash patterns: * = any substring. More specific pattern wins.
-// On equal specificity, the last one in the list wins.
+// Legacy notes:
+// - old permissions 'cwd' and 'deny' are migrated to the new ask-based model
+// - tools.* below is only a fallback for custom/other tools
+//   path tools use the root-based policy and meta-tools use alwaysAskTools
 // =============================================================================
 {
-  // Tool permissions
+  "trustedRoots": [
+    "."
+  ],
+
+  "sensitivePaths": [
+    ".env",
+    ".git/",
+    "~/.pi/agent/auth.json",
+    "~/.pi/agent/sessions/"
+  ],
+
+  "alwaysAskTools": [
+    "mcp",
+    "subagent",
+    "subagent_status",
+    "team_create",
+    "spawn_teammate",
+    "spawn_lead_window",
+    "send_message",
+    "broadcast_message",
+    "read_inbox",
+    "task_create",
+    "task_submit_plan",
+    "task_evaluate_plan",
+    "task_list",
+    "task_update",
+    "team_shutdown",
+    "task_read",
+    "check_teammate",
+    "process_shutdown_approved"
+  ],
+
   "tools": {
-    "read": "cwd",      // file reading - free inside project
-    "grep": "cwd",      // content search - free inside project
-    "find": "cwd",      // file search - free inside project
-    "ls": "cwd",        // directory listing - free inside project
-    "write": "ask",     // file writing - always ask
-    "edit": "ask",      // file editing - always ask
-    "bash": "ask",      // bash default (overridden by patterns below)
-    "mcp": "ask"        // MCP calls - always ask
+    // Fallback permissions for non-path, non-bash, non-meta custom tools.
+    // Example:
+    // "my_custom_tool": "allow"
   },
 
-  // Bash patterns (order matters for equal specificity!)
   "bash": {
-    // --- Safe read-only commands ---
+    // Initial safe allowlist.
+    "pwd": "allow",
     "git status": "allow",
     "git diff *": "allow",
     "git log *": "allow",
     "git branch": "allow",
     "git branch --list *": "allow",
     "git remote -v": "allow",
-    "ls *": "allow",
-    "cat *": "allow",
-    "echo *": "allow",
-    "pwd": "allow",
-    "which *": "allow",
-    "find *": "allow",
-    "grep *": "allow",
-    "head *": "allow",
-    "tail *": "allow",
-    "wc *": "allow",
-    "sort *": "allow",
-    "date": "allow",
-    "date *": "allow",
-    "whoami": "allow",
-    "uname *": "allow",
-    "env": "allow",
-    "printenv *": "allow",
-    "type *": "allow",
-    "file *": "allow",
-    "stat *": "allow",
-    "du *": "allow",
-    "df *": "allow",
-    "test *": "allow",
-    "[ *": "allow",
-    "basename *": "allow",
-    "dirname *": "allow",
-    "realpath *": "allow",
-    "readlink *": "allow",
 
-    // --- Commands that require confirmation ---
-    "git *": "ask",
-    "npm *": "ask",
-    "npx *": "ask",
-    "node *": "ask",
-    "pnpm *": "ask",
-    "yarn *": "ask",
-    "bun *": "ask",
-    "deno *": "ask",
-    "pip *": "ask",
-    "pip3 *": "ask",
-    "python *": "ask",
-    "python3 *": "ask",
-    "cargo *": "ask",
-    "go *": "ask",
-    "make *": "ask",
-    "cmake *": "ask",
-    "docker *": "ask",
-    "kubectl *": "ask",
-    "brew *": "ask",
-    "apt *": "ask",
-    "apt-get *": "ask",
-    "curl *": "ask",
-    "wget *": "ask",
-
-    // --- Blocked commands ---
-    "sudo *": "deny"
+    // Optional non-risky ask rules. Matching "ask" becomes ask-session.
+    // Risky syntax/families (npm, curl, pipes, redirects, sudo, etc.) still ask once only.
+    "git *": "ask"
   }
 }
